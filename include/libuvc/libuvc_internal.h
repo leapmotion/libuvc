@@ -9,7 +9,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#ifndef _WIN32
 #include <pthread.h>
+#else
+#include <winpthreads.h>
+#endif
 #include <signal.h>
 #include <libusb.h>
 #include "utlist.h"
