@@ -1,5 +1,8 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.1)
 project(libuvc)
+
+set(EXTERNAL_LIBRARY_DIR "K:/Libraries-x64_vc141")
+set(PKG_CONFIG_EXECUTABLE "C:/git-sdk-64/mingw64/bin/pkg-config.exe")
 
 if (NOT CMAKE_BUILD_TYPE)
   message(STATUS "No build type selected, default to Release")
@@ -22,8 +25,13 @@ set(libuvc_VERSION ${libuvc_VERSION_MAJOR}.${libuvc_VERSION_MINOR}.${libuvc_VERS
 set(libuvc_DESCRIPTION "A cross-platform library for USB video devices")
 set(libuvc_URL "https://github.com/ktossell/libuvc")
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake-modules")
+
+find_package(LibUSB 1.0 REQUIRED)
+message(STATUS "LibUSB_ROOT_DIR ${LibUSB_ROOT_DIR}")
+
 find_package(PkgConfig)
-pkg_check_modules(LIBUSB libusb-1.0)
+#pkg_check_modules(LibUSB libusb)
 
 # Try to find JPEG using a module or pkg-config. If that doesn't work, search for the header.
 find_package(jpeg QUIET)
@@ -57,7 +65,8 @@ SET(SOURCES src/ctrl.c src/ctrl-gen.c src/device.c src/diag.c
 include_directories(
   ${libuvc_SOURCE_DIR}/include
   ${libuvc_BINARY_DIR}/include
-  ${LIBUSB_INCLUDE_DIRS}
+  ${LibUSB_INCLUDE_DIR}
+  ${LibUSB_INCLUDE_DIR}/libusb
 )
 
 if(JPEG_FOUND)
@@ -74,7 +83,7 @@ if(${CMAKE_BUILD_TARGET} MATCHES "Shared")
 elseif(${CMAKE_BUILD_TARGET} MATCHES "Static")
   set(BUILD_UVC_STATIC TRUE)
 elseif(${CMAKE_BUILD_TARGET} MATCHES "Both")
-  set(BUILD_UVC_SHARED TRUE)
+  #set(BUILD_UVC_SHARED TRUE)
   set(BUILD_UVC_STATIC TRUE)
 else()
   message( FATAL_ERROR "Invalid build type ${CMAKE_BUILD_TARGET}" )
@@ -106,10 +115,10 @@ if(BUILD_UVC_SHARED)
     target_link_libraries (uvc ${JPEG_LINK_FLAGS})
   endif(JPEG_FOUND)
 
-  target_link_libraries(uvc ${LIBUSB_LIBRARIES})
+  target_link_libraries(uvc ${LibUSB_LIBRARIES})
 
   #add_executable(test src/test.c)
-  #target_link_libraries(test uvc ${LIBUSB_LIBRARIES} opencv_highgui
+  #target_link_libraries(test uvc ${LibUSB_LIBRARIES} opencv_highgui
   #  opencv_core)
 endif()
 
