@@ -11,7 +11,7 @@ extern "C" {
 #include <time.h>
 #else
 #include <sys/time.h>
-endif
+#endif
 #include <libuvc/libuvc_config.h>
 
 struct libusb_context;
